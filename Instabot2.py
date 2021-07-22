@@ -335,7 +335,6 @@ class Instabot:
     def check_pic(self):
         pass
 
-
     def fake_scroll(self, probability, num_scrolls=2):
 
         print(f"Method: {sys._getframe().f_code.co_name}")
@@ -353,7 +352,6 @@ class Instabot:
                 "#follows", "#unfollows"]
         db_handler = xlsx_handler.date_time_xlsx_handler(f"{username}_specs", cols)
         return db_handler
-
 
     def entry_todays_specs(self, username,db_handler=None):
 
@@ -405,7 +403,6 @@ class Instabot:
 
         today=db_handler.add_today_smart(data)
         return db_handler
-
 
     def get_engagement(self, account, num_posts='all'):
 
@@ -471,8 +468,6 @@ class Instabot:
                 print(f"{account} something went wrong. Final image counter{counter} ")
 
         return stats
-
-
 
     def report_today(self, handler):
         print(f"Method: {sys._getframe().f_code.co_name} ")
@@ -588,6 +583,8 @@ class Instabot:
         fig.tight_layout()
         plt.show()
         fig.savefig(f"{account}.png")
+
+
 
 
 

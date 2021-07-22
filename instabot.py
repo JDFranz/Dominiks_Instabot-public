@@ -30,7 +30,7 @@ radnomize = True
 
 
 def return_login():
-    return ['deinusername', 'deinpasswort']
+    return []
 
 
 
@@ -57,6 +57,7 @@ def generate_hashtags(filename: string, size):
     lines = text_file.readlines()
     lines = [x.strip() for x in lines if x.strip()]
     lines = [x.replace('#', '') for x in lines]
+    print(lines)
     return random.sample(lines, size)
 
 
@@ -74,15 +75,19 @@ class Instabot:
         self.username = username
         self.keyboard = Controller()
         # accept cookies
-        self.driver.find_element_by_xpath('/html/body/div[2]/div/div/div/div[2]/button[1]').click()
+        try:
+            self.driver.find_element_by_xpath('/html/body/div[2]/div/div/div/div[2]/button[1]').click()
+        except:
+            self.driver.find_element_by_xpath('/html/body/div[3]/div/div/button[1]').click()
+
         # fill username , pw, and hit log in#
-        sleep_random_above(4)
+        sleep_random_above(1)
         self.driver.find_element_by_xpath('//*[@id="loginForm"]/div/div[1]/div/label/input').send_keys(self.username)
         sleep_random_above(2)
         self.driver.find_elements_by_xpath('//*[@id="loginForm"]/div/div[2]/div/label/input')[0].send_keys(self.pw)
-        sleep_random_above(1)
+        sleep_random_above(3)
         self.driver.find_element_by_xpath('//*[@id="loginForm"]/div/div[3]').click()
-        sleep_random_above(4)
+        sleep_random_above(3)
 
         '''
                 button = self.driver.find_elements_by_xpath('/html/body/div[1]/section/main/div/div/div/div/button')
@@ -103,13 +108,13 @@ class Instabot:
         except:
             pass
         finally:
-            sleep_random_above(1)
+            sleep_random_above(2)
             # notifications
             button = self.driver.find_elements_by_xpath('/html/body/div[4]/div/div/div/div[3]/button[2]')
             sleep_random_above(1.5)
             button[0].click()
             sleep_random_above(1)
-            # logged in
+            # logged in5
 
     #  def waitforObj(self,type, string):
     #     return Webdriverwait(self.driver,10 ).until(EC.presence_of _all_elements_located((type,string)))
@@ -822,6 +827,16 @@ class Instabot:
             self.like_feed(len(list_hashtags) * counter)
 
     def lpnc_hastags(self, list_hashtags: list, avg_num_likes: int):
+        print(f"Method: {sys._getframe().f_code.co_name}")
+        # like post and comments
+        counter = 0
+        for hashtag in list_hashtags:
+            counter += 1
+            num_likes = int(np.random.normal(avg_num_likes, avg_num_likes / 5))
+            print(f"liked {num_likes} in hashtag: {hashtag}")
+            self.like_N_postsandcomments_hashtag(hashtag, num_likes)
+
+    def lpnc_hastags(self, list_hashtags: list, avg_num_likes: int):
         # like post and comments
         counter = 0
         for hashtag in list_hashtags:
@@ -1093,6 +1108,9 @@ class Instabot:
 
 
 
+
+
+
 def concise_procedure():
     while True:
         hashtags = []
@@ -1166,7 +1184,6 @@ def safe_sceleton():
     finally:
         print("========================>>>RESTART")
         os.system("instabot.py")
-
 
 def stupid_mode():
     try:
@@ -1268,8 +1285,54 @@ def stupid_mode():
     #<class 'selenium.common.exceptions.NoSuchElementException'>
 
 
+def only_liking():
+    try:
+        hashtags = []
+        hashtags.append(generate_hashtags('calisthenics_hashtags', 10))
+        hashtags.append(generate_hashtags('motivational', 10))
+        hashtags.append(generate_hashtags('most_liked_hashtags.txt', 10))
+        hashtags.append(generate_hashtags('hashtags', 10))
+
+
+        try:# Setup
+            print("###############################################Login and setup")
+            bot = Instabot(return_login()[0], return_login()[1])
+        except Exception as inst:
+            print('=========================>>> BAD SETUP')
+            print(inst)
+            raise Exception("Bot setup went wrong")
+
+
+
+
+
+        for hashtaglist in hashtags:
+
+            for i in range(5):
+                if not (bot.check_volume_below(np.random.randint(50, 70), np.random.randint(175, 225))): quit()
+
+                if (np.random.randint(0, 100) < 80):
+                    bot.lpnc_hastags(hashtaglist, np.random.randint(5,20))
+
+                else:
+                    bot.lpnc_hastags_feed(hashtaglist, np.random.randint(5, 20))
+                    sleep_random_normal(500)
+
+    except Exception as inst:
+        print(inst)
+        try:
+            bot.__del__()
+        except:
+            pass
+
+    finally:
+        print("========================>>>RESTART")
+        os.system("instabot.py")
+
+
+
 
 
 if __name__ == "__main__":
 
-    stupid_mode()
+    only_liking()
