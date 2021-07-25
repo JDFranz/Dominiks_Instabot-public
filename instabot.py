@@ -4,6 +4,7 @@ import os
 import random
 import string
 import sys
+import openpyxl
 from time import sleep
 
 import numpy as np
@@ -30,7 +31,7 @@ radnomize = True
 
 
 def return_login():
-    return []
+    return ['']
 
 
 
@@ -249,17 +250,48 @@ class Instabot:
                 like_button.click()
                 self.likedpics += 1
                 print(f"liked in session: {self.likedpics}")
+                self.push_read_actions(0, 1)
                 return True
-
             except:
+                pass
+
+            try:
+                like_button = self.driver.find_element_by_xpath(
+                    "//article//section//button//*[@aria-label='Like]")
+                like_button.click()
+                self.likedpics += 1
+                print(f"liked in session: {self.likedpics}")
+                self.push_read_actions(0, 1)
+                return True
+            except:
+                pass
+
+
+
+            try:
                 print("searching with waitfor")
                 like_button = WebDriverWait(self.driver, 5).until(
                     EC.presence_of_element_located((By.XPATH,
-                                                    "//article//section//button//*[@aria-label='Gefällt mir']")))
-            like_button.click()
-            self.likedpics += 1
-            self.push_read_actions(0, 1)
-            return True
+                                                        "//article//section//button//*[@aria-label='Gefällt mir']")))
+                like_button.click()
+                self.likedpics += 1
+                self.push_read_actions(0, 1)
+                return True
+            except:
+                pass
+
+            try:
+                like_button = self.driver.find_element_by_xpath(
+                    "/html/body/div[5]/div[2]/div/article/div[3]/section[1]/span[1]/button")
+                like_button.click()
+                self.likedpics += 1
+                print(f"liked in session: {self.likedpics}")
+                self.push_read_actions(0, 1)
+                return True
+
+            except:
+                pass
+
 
         except:
             try:
@@ -482,11 +514,11 @@ class Instabot:
     def push_followers_to_db(self, followerlist):
 
         print(f"Method: {sys._getframe().f_code.co_name}")
-        df = pd.read_excel(f"{self.username}.xlsx")
+        df = pd.read_excel(f"{self.username}.xlsxx")
         new_entry = pd.DataFrame(
             {"date": dt.date, "time": dt.date, "num_follower": len(followerlist), "followerlist": followerlist})
         df = df.concat([df, new_entry])
-        df.to_excel(f"{self.username}.xlsx")
+        df.to_excel(f"{self.username}.xlsxx")
         pass
 
     def get_followers_from_db(self):
@@ -866,7 +898,7 @@ class Instabot:
     def init_specs_today(self):
         print(f"Method: {sys._getframe().f_code.co_name}")
         try:
-            df = pd.read_excel(f'{self.username}_specs.xls')
+            df = pd.read_excel(f'{self.username}_specs.xlsxx')
             try:
                 todays_specs = df.loc[df['date'] == str(dt.date.today())]
                 if not todays_specs.empty:
@@ -892,7 +924,7 @@ class Instabot:
 
         df = df.append(todays_specs, ignore_index=True)
         print(df)
-        df.to_excel(f'{self.username}_specs.xls', index=False)
+        df.to_excel(f'{self.username}_specs.xlsx', index=False)
 
         return df
 
@@ -900,18 +932,18 @@ class Instabot:
         print(f"Method: {sys._getframe().f_code.co_name}")
 
         try:
-            df = pd.read_excel(f'{self.username}_specs.xls')
+            df = pd.read_excel(f'{self.username}_specs.xlsx')
 
             todays_specs = df.loc[df['date'] == str(dt.date.today())]
             if todays_specs.empty:
                 print('-->Specs for today dont exists')
                 df = self.init_specs_today()
-                df.to_excel(f'{self.username}_specs.xls', index=False)
+                df.to_excel(f'{self.username}_specs.xlsx', index=False)
 
         except:
-            print(f'{self.username}_specs.xls does not exist')
+            print(f'{self.username}_specs.xlsx does not exist')
             df = self.init_specs_today()
-            df.to_excel(f'{self.username}_specs.xls', index=False)
+            df.to_excel(f'{self.username}_specs.xlsx', index=False)
 
 
         finally:
@@ -923,13 +955,13 @@ class Instabot:
                 print(f"push like")
                 df.loc[df['date'] == str(dt.date.today()), 'liked_today'] += push_like
 
-            df.to_excel(f'{self.username}_specs.xls', index=False)
+            df.to_excel(f'{self.username}_specs.xlsx', index=False)
 
         return df
 
     def check_volume_below(self, follows=50, likes=200):
         try:
-            df = pd.read_excel(f'{self.username}_specs.xls')
+            df = pd.read_excel(f'{self.username}_specs.xlsx')
 
             todays_specs = df.loc[df['date'] == str(dt.date.today())]
             if todays_specs.empty:
@@ -937,7 +969,7 @@ class Instabot:
                 df = self.init_specs_today()
 
         except:
-            print(f'{self.username}_specs.xls does not exist')
+            print(f'{self.username}_specs.xlsx does not exist')
             df = self.init_specs_today()
 
 
@@ -985,7 +1017,7 @@ class Instabot:
         print(f"Method: {sys._getframe().f_code.co_name}")
 
         try:
-            df = pd.read_excel(f'{self.username}_specs.xls')
+            df = pd.read_excel(f'{self.username}_specs.xlsx')
         except:
             df = pd.DataFrame()
 
@@ -1012,7 +1044,7 @@ class Instabot:
 
             df = df.append(todays_specs, ignore_index=True)
             print(df)
-            df.to_excel(f'{self.username}_specs.xls', index=False)
+            df.to_excel(f'{self.username}_specs.xlsx', index=False)
 
         return df
 
@@ -1036,11 +1068,11 @@ class Instabot:
 
 
         try:
-            network_df = pd.read_excel(f"{self.username}_network.xls")
+            network_df = pd.read_excel(f"{self.username}_network.xlsx")
 
         except:
             network_df = pd.DataFrame(columns=['Account', 'Followers'])
-            network_df.to_excel(f"{self.username}_network.xls", index=False)
+            network_df.to_excel(f"{self.username}_network.xlsx", index=False)
 
         print(f"today's specs: {todays_specs['Followers_list']}")
         print(network_df['Account'])
@@ -1056,14 +1088,14 @@ class Instabot:
                 sleep_random_above(20)
 
                 network_df = network_df.append({'Account': follower, 'Followers': followers}, ignore_index=True)
-                network_df.to_excel(f"{self.username}_network.xls", index=False)
+                network_df.to_excel(f"{self.username}_network.xlsx", index=False)
 
         # deleting old followers network
 
         # network_df = network_df[network_df.Account in Convert(todays_specs['Followers_list'].values)]
-        network_df.to_excel(f"{self.username}_network.xls", index=False)
+        network_df.to_excel(f"{self.username}_network.xlsx", index=False)
 
-        return network_df, todays_specs, f"{self.username}_network.xls"
+        return network_df, todays_specs, f"{self.username}_network.xlsx"
 
     def check_pic(self,limit):
 
@@ -1330,6 +1362,49 @@ def only_liking():
         os.system("instabot.py")
 
 
+def only_following():
+    try:
+        hashtags = []
+        hashtags.append(generate_hashtags('calisthenics_hashtags', 10))
+        hashtags.append(generate_hashtags('motivational', 10))
+        hashtags.append(generate_hashtags('most_liked_hashtags.txt', 10))
+        hashtags.append(generate_hashtags('hashtags', 10))
+
+
+        try:# Setup
+            print("###############################################Login and setup")
+            bot = Instabot(return_login()[0], return_login()[1])
+        except Exception as inst:
+            print('=========================>>> BAD SETUP')
+            print(inst)
+            raise Exception("Bot setup went wrong")
+
+
+
+
+
+        for hashtaglist in hashtags:
+
+            for i in range(5):
+                if not (bot.check_volume_below(np.random.randint(50, 70), np.random.randint(175, 225))): quit()
+
+                if (np.random.randint(0, 100) < 80):
+                    bot.lpnc_hastags(hashtaglist, np.random.randint(5,20))
+
+                else:
+                    bot.lpnc_hastags_feed(hashtaglist, np.random.randint(5, 20))
+                    sleep_random_normal(500)
+
+    except Exception as inst:
+        print(inst)
+        try:
+            bot.__del__()
+        except:
+            pass
+
+    finally:
+        print("========================>>>RESTART")
+        os.system("instabot.py")
 
 
 
